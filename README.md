@@ -9,7 +9,7 @@ one place.
 
 ```hcl
 module "iam" {
-  source = "github.com/cybercapybara/terraform-aws-iam"
+  source = "github.com/moveeeax/terraform-aws-iam"
 
   name               = "app-role"
   assume_role_policy = data.aws_iam_policy_document.assume.json
