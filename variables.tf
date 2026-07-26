@@ -1,6 +1,19 @@
 variable "name" {
   description = "Name of the IAM role."
   type        = string
+
+  # AWS validates the same constraints, but only after a round-trip to the
+  # API. Catching an invalid name here fails the plan immediately instead of
+  # with an opaque AWS error partway through apply.
+  validation {
+    condition     = length(var.name) > 0 && length(var.name) <= 64
+    error_message = "name must be between 1 and 64 characters."
+  }
+
+  validation {
+    condition     = can(regex("^[A-Za-z0-9_+=,.@-]+$", var.name))
+    error_message = "name may only contain alphanumeric characters and the symbols _+=,.@-."
+  }
 }
 
 variable "assume_role_policy" {
@@ -73,6 +86,11 @@ variable "path" {
   description = "Path under which to create the role."
   type        = string
   default     = "/"
+
+  validation {
+    condition     = length(var.path) <= 512 && can(regex("^/([!-~]+/)*$", var.path))
+    error_message = "path must start and end with a slash and contain only printable, non-space ASCII characters, e.g. \"/\" or \"/team/backend/\"."
+  }
 }
 
 variable "permissions_boundary" {
@@ -96,6 +114,17 @@ variable "managed_policy_arns" {
   description = "List of managed policy ARNs to attach to the role."
   type        = list(string)
   default     = []
+}
+
+variable "force_detach_policies" {
+  description = <<-EOT
+    Whether to force-detach any policies attached to the role before
+    destroying it. Without this, destroying a role that has policies
+    attached outside of this module (e.g. by hand, or by another Terraform
+    root) fails with a DeleteConflict from AWS instead of cleaning up.
+  EOT
+  type        = bool
+  default     = false
 }
 
 variable "tags" {

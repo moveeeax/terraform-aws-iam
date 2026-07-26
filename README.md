@@ -81,16 +81,17 @@ beyond `terraform init`. Provider mocking requires Terraform (or OpenTofu)
 
 ## Inputs
 
-| Name                   | Description                                                       | Type           | Default   | Required |
-|------------------------|-------------------------------------------------------------------|----------------|-----------|:--------:|
-| `name`                 | Name of the IAM role.                                            | `string`       | n/a       |   yes    |
-| `assume_role_policy`   | JSON trust policy for the role. Validated — see [guardrails](#trust-policy-guardrails). | `string` | n/a |   yes    |
-| `description`          | Description of the IAM role.                                     | `string`       | `"Managed by Terraform"` | no |
-| `path`                 | Path under which to create the role.                            | `string`       | `"/"`     |    no    |
-| `permissions_boundary` | ARN of the policy used as the role's permissions boundary.      | `string`       | `null`    |    no    |
-| `max_session_duration` | Maximum session duration in seconds.                            | `number`       | `3600`    |    no    |
-| `managed_policy_arns`  | List of managed policy ARNs to attach.                          | `list(string)` | `[]`      |    no    |
-| `tags`                 | Tags applied to the role.                                       | `map(string)`  | `{}`      |    no    |
+| Name                    | Description                                                       | Type           | Default   | Required |
+|-------------------------|-------------------------------------------------------------------|----------------|-----------|:--------:|
+| `name`                  | Name of the IAM role. 1-64 characters, matching `[A-Za-z0-9_+=,.@-]+`. | `string` | n/a  |   yes    |
+| `assume_role_policy`    | JSON trust policy for the role. Validated — see [guardrails](#trust-policy-guardrails). | `string` | n/a |   yes    |
+| `description`           | Description of the IAM role.                                     | `string`       | `"Managed by Terraform"` | no |
+| `path`                  | Path under which to create the role. Must start and end with `/`. | `string`       | `"/"`     |    no    |
+| `permissions_boundary`  | ARN of the policy used as the role's permissions boundary.      | `string`       | `null`    |    no    |
+| `max_session_duration`  | Maximum session duration in seconds.                            | `number`       | `3600`    |    no    |
+| `managed_policy_arns`   | List of managed policy ARNs to attach.                          | `list(string)` | `[]`      |    no    |
+| `force_detach_policies` | Force-detach attached policies when the role is destroyed.      | `bool`         | `false`   |    no    |
+| `tags`                  | Tags applied to the role.                                       | `map(string)`  | `{}`      |    no    |
 
 ## Outputs
 
