@@ -116,6 +116,46 @@ variable "managed_policy_arns" {
   default     = []
 }
 
+variable "inline_policies" {
+  description = <<-EOT
+    Map of inline policies to embed in the role, keyed by policy name, with the
+    JSON policy document as the value. Inline policies live and die with the
+    role and cannot be attached anywhere else.
+  EOT
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition     = alltrue([for k, v in var.inline_policies : can(regex("^[A-Za-z0-9_+=,.@-]{1,128}$", k))])
+    error_message = "inline_policies keys are used as policy names and must be 1-128 characters of alphanumerics and _+=,.@-."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.inline_policies : can(jsondecode(v))])
+    error_message = "Every inline_policies value must be a valid JSON policy document."
+  }
+}
+
+variable "policy_documents" {
+  description = <<-EOT
+    Map of customer-managed policies to create and attach to the role, keyed by
+    a short name, with the JSON policy document as the value. Each policy is
+    named "<role name>-<key>" and created under the role's path.
+  EOT
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition     = alltrue([for k, v in var.policy_documents : can(regex("^[A-Za-z0-9_+=,.@-]+$", k))])
+    error_message = "policy_documents keys become part of the policy name and may only contain alphanumerics and _+=,.@-."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.policy_documents : can(jsondecode(v))])
+    error_message = "Every policy_documents value must be a valid JSON policy document."
+  }
+}
+
 variable "force_detach_policies" {
   description = <<-EOT
     Whether to force-detach any policies attached to the role before
